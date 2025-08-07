@@ -1,0 +1,77 @@
+# =========================
+# Node.js / Express project
+# =========================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.env
+.env.*.local
+
+# ====================
+# Build & Dist outputs
+# ====================
+dist/
+build/
+out/
+.next/
+.cache/
+coverage/
+
+# =====================
+# OS-specific files
+# =====================
+.DS_Store
+Thumbs.db
+
+# ====================
+# VS Code & JetBrains
+# ====================
+.vscode/
+.idea/
+
+# ====================
+# Postman
+# ====================
+*.postman_collection.json
+*.postman_environment.json
+
+# ====================
+# Tailwind CSS generated files
+# ====================
+*.css.map
+
+# ====================
+# Log files
+# ====================
+*.log
+logs/
+*.sqlite
+*.sqlite3
+
+# ====================
+# PM2 process logs (optional)
+# ====================
+pids/
+*.pid
+*.seed
+
+# ====================
+# PostgreSQL (optional local DB dumps or data)
+# ====================
+*.dump
+*.sql
+*.db
+
+# ====================
+# Render.com specific (if any tmp, cache used)
+# ====================
+.render/
+
+# ====================
+# Optional: Ignore uploads/temp folders
+# ====================
+uploads/
+tmp/
+temp/
