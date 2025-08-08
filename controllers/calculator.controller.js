@@ -1,5 +1,5 @@
-const CalculatorModel = require("./models/calculator.model.js");
-const CalculatorService = require("./services/calculator.service.js");
+const CalculatorModel = require("../models/calculator.model.js");
+const CalculatorService = require("../services/calculator.service.js");
 
 const getRoot = (req, res) => {
   res.status(200).json({
