@@ -1,11 +1,12 @@
-const express = require('express');
+const express = require("express");
+require("./models/db.js");
+const calculatorRoutes = require("./routes/calculator.routes.js");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.get('/', (req, res) => {
-  res.json({ message: 'Selamat datang di API Kalkulator Tani Bromo!' });
-});
+app.use(express.json());
+app.use("/api", calculatorRoutes);
 
 app.listen(PORT, () => {
-  console.log(`Server berjalan di port ${PORT}`);
+  console.log(`Server berjalan di http://localhost:${PORT}`);
 });
