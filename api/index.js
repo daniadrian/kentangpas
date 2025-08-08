@@ -1,13 +1,11 @@
 const express = require("express");
+require("../models/db.js");
+const calculatorRoutes = require("../routes/calculator.routes.js");
+
 const app = express();
 
-app.get("/api/test", (req, res) => {
-  console.log("SUCCESS: /api/test endpoint was hit!");
+app.use(express.json());
 
-  res.status(200).json({
-    status: "success",
-    message: "Hello from Vercel! The basic server is working correctly.",
-  });
-});
+app.use(calculatorRoutes);
 
 module.exports = app;
