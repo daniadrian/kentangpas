@@ -1,6 +1,6 @@
 const express = require("express");
-require("../models/db.js");
-const calculatorRoutes = require("../routes/calculator.routes.js");
+require("./models/db.js");
+const calculatorRoutes = require("./routes/calculator.routes.js");
 
 const app = express();
 

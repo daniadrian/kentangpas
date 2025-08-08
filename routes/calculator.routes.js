@@ -1,10 +1,10 @@
 const express = require("express");
 const router = express.Router();
-const calculatorController = require("../controllers/calculator.controller.js");
+const calculatorController = require("./controllers/calculator.controller.js");
 const {
   calculateRules,
   validate,
-} = require("../middlewares/calculator.validator.js");
+} = require("./middlewares/calculator.validator.js");
 
 router.get("/", calculatorController.getRoot);
 router.get("/parameters", calculatorController.getSeedParameters);
