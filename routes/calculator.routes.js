@@ -8,9 +8,6 @@ const {
 
 router.get("/", calculatorController.getRoot);
 router.get("/parameters", calculatorController.getSeedParameters);
-
-// Nantinya, route untuk kalkulasi akan kita ditambahkan di sini. Contoh:
-// router.post('/calculate', calculatorController.calculateSeeds);
 router.post(
   "/calculate",
   calculateRules(),
