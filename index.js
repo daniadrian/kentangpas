@@ -1,3 +1,9 @@
+console.log("🚀 Starting app...");
+console.log(
+  "📂 Loading calculator routes from:",
+  require.resolve("./routes/calculator.routes.js")
+);
+
 const express = require("express");
 require("./models/db.js");
 const calculatorRoutes = require("./routes/calculator.routes.js");
