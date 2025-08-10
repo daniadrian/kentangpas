@@ -42,3 +42,5 @@ pids/
 uploads/
 tmp/
 temp/
+
+/generated/prisma
