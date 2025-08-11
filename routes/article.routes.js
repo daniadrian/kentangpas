@@ -11,6 +11,7 @@ router.get("/", async (req, res) => {
     const articles = await articleService.getAllArticles();
     res.json(articles);
   } catch (err) {
+    console.error("Error fetching articles:", err);
     res.status(500).json({ error: "Failed to fetch articles" });
   }
 });
