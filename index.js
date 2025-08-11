@@ -1,9 +1,3 @@
-console.log("🚀 Starting app...");
-console.log(
-  "📂 Loading calculator routes from:",
-  require.resolve("./routes/calculator.routes.js")
-);
-
 const express = require("express");
 require("./models/db.js");
 const calculatorRoutes = require("./routes/calculator.routes.js");
@@ -16,10 +10,9 @@ app.use("/api", calculatorRoutes);
 
 module.exports = app;
 
-// npm run dev
 if (process.env.NODE_ENV !== "production") {
   const PORT = process.env.PORT || 5431;
-  app.listen(PORT, () => {
-    console.log(`Server berhasil berjalan di http://localhost:${PORT}`);
+  app.listen(PORT, "0.0.0.0", () => {
+    console.log(`Server berjalan di http://0.0.0.0:${PORT}`);
   });
 }
