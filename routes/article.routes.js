@@ -1,6 +1,11 @@
 const express = require("express");
 const router = express.Router();
 const articleService = require("../services/article.service.js");
+const path = require("path");
+const articleService = require(path.resolve(
+  __dirname,
+  "../services/article.service.js"
+));
 
 router.get("/", async (req, res) => {
   try {
