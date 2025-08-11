@@ -1,0 +1,24 @@
+const express = require("express");
+const router = express.Router();
+const articleService = require("../services/article.service");
+
+router.get("/", async (req, res) => {
+  try {
+    const articles = await articleService.getAllArticles();
+    res.json(articles);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch articles" });
+  }
+});
+
+router.get("/:slug", async (req, res) => {
+  try {
+    const article = await articleService.getArticleBySlug(req.params.slug);
+    if (!article) return res.status(404).json({ error: "Article not found" });
+    res.json(article);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch article" });
+  }
+});
+
+module.exports = router;

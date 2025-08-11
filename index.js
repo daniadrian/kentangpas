@@ -1,12 +1,14 @@
 const express = require("express");
 require("./models/db.js");
 const calculatorRoutes = require("./routes/calculator.routes.js");
+const articleRoutes = require("./routes/article.routes.js");
 
 const app = express();
 
 app.use(express.json());
 
 app.use("/api", calculatorRoutes);
+app.use("/api/articles", articleRoutes);
 
 module.exports = app;
 
