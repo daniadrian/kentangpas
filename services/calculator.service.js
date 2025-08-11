@@ -1,10 +1,22 @@
 /**
- * @description Menghitung estimasi kebutuhan bibit berdasarkan parameter lahan.
- * @param {object} params Objek berisi parameter dari input pengguna.
- * @returns {object} Objek berisi hasil kalkulasi yang lengkap.
+ * @file calculator.service.js
+ * @description Service untuk perhitungan estimasi kebutuhan bibit
+ * @version 1.0.0
  */
 
-const crypto = require("crypto");
+/**
+ * @desc Menghitung estimasi kebutuhan bibit berdasarkan parameter lahan
+ * @param {Object} params - Parameter dari input pengguna
+ * @param {number|string} params.panjangLahan - Panjang lahan (meter)
+ * @param {number|string} params.lebarLahan - Lebar lahan (meter)
+ * @param {number|string} params.lebarGuludan - Lebar guludan (meter)
+ * @param {number|string} params.lebarParit - Lebar parit/gerandul (meter)
+ * @param {number|string} params.jarakTanam - Jarak tanam (meter)
+ * @param {number|string} [params.jumlahBibitPerKg] - Opsional, jumlah bibit per kg
+ * @param {number|string} [params.estimasiHarga] - Opsional, estimasi harga per unit bibit
+ * @param {string} [params.generasiBibit] - Generasi bibit (misal: G0)
+ * @returns {Object} Hasil kalkulasi
+ */
 const calculateSeedNeeds = (params) => {
   const panjangLahan = parseFloat(params.panjangLahan);
   const lebarLahan = parseFloat(params.lebarLahan);
@@ -12,7 +24,7 @@ const calculateSeedNeeds = (params) => {
   const lebarParit = parseFloat(params.lebarParit);
   const jarakTanam = parseFloat(params.jarakTanam);
 
-  const { jumlahBibitPerKg, estimasiHarga } = params;
+  const { jumlahBibitPerKg, estimasiHarga, generasiBibit } = params;
 
   const lebarUnitTanam = lebarGuludan + lebarParit;
   const jumlahGuludan = Math.floor(lebarLahan / lebarUnitTanam);
@@ -21,7 +33,7 @@ const calculateSeedNeeds = (params) => {
 
   let kebutuhanBibit = 0;
   let unitBibit = "kg";
-  if (params.generasiBibit === "G0") {
+  if (generasiBibit === "G0") {
     kebutuhanBibit = totalPopulasiTanaman;
     unitBibit = "biji";
   } else {
@@ -34,7 +46,7 @@ const calculateSeedNeeds = (params) => {
     totalEstimasiBiaya = kebutuhanBibit * parseFloat(estimasiHarga);
   }
 
-  const result = {
+  return {
     ringkasanLahan: {
       lebarUnitTanam: `${lebarUnitTanam.toFixed(2)} meter`,
       jumlahGuludan: `${jumlahGuludan} baris`,
@@ -58,8 +70,6 @@ const calculateSeedNeeds = (params) => {
           : "Tidak dihitung",
     },
   };
-
-  return result;
 };
 
 module.exports = {

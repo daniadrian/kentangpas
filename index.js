@@ -1,10 +1,17 @@
 const express = require("express");
+const morgan = require("morgan");
+const helmet = require("helmet");
+require("dotenv").config();
+
 require("./models/db.js");
+
 const calculatorRoutes = require("./routes/calculator.routes.js");
 const articleRoutes = require("./routes/article.routes.js");
 
 const app = express();
 
+app.use(helmet());
+app.use(morgan("dev"));
 app.use(express.json());
 
 app.use("/api", calculatorRoutes);
