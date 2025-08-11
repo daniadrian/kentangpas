@@ -11,7 +11,6 @@ const getAllArticles = async () =>
       bannerUrl: true,
       author: true,
       publishedAt: true,
-      excerpt: true,
     },
   });
 
@@ -25,7 +24,6 @@ const getArticleBySlug = async (slug) =>
       bannerUrl: true,
       author: true,
       publishedAt: true,
-      excerpt: true,
       articleContent: true,
     },
   });
