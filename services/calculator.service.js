@@ -62,13 +62,6 @@ const calculateSeedNeeds = (params) => {
   return result;
 };
 
-const finalResult = {
-  id: crypto.randomUUID(),
-  calculatedAt: new Date().toISOString(),
-  inputs: params,
-  outputs: result,
-};
-
 module.exports = {
   calculateSeedNeeds,
 };
