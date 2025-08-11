@@ -3,6 +3,8 @@
  * @param {object} params Objek berisi parameter dari input pengguna.
  * @returns {object} Objek berisi hasil kalkulasi yang lengkap.
  */
+
+const crypto = require("crypto");
 const calculateSeedNeeds = (params) => {
   const panjangLahan = parseFloat(params.panjangLahan);
   const lebarLahan = parseFloat(params.lebarLahan);
@@ -58,6 +60,13 @@ const calculateSeedNeeds = (params) => {
   };
 
   return result;
+};
+
+const finalResult = {
+  id: crypto.randomUUID(),
+  calculatedAt: new Date().toISOString(),
+  inputs: params,
+  outputs: result,
 };
 
 module.exports = {
