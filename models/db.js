@@ -1,9 +1,3 @@
-/**
- * @file db.js
- * @description Konfigurasi koneksi PostgreSQL menggunakan pg.Pool
- * @version 1.0.0
- */
-
 require("dotenv").config();
 const { Pool } = require("pg");
 
@@ -24,14 +18,12 @@ if (process.env.DATABASE_URL) {
 
 const pool = new Pool(connectionConfig);
 
-pool
-  .connect()
-  .then((client) => {
-    console.log("✅ Koneksi ke database PostgreSQL berhasil!");
-    client.release();
-  })
-  .catch((err) => {
-    console.error("❌ Error saat koneksi ke database:", err.stack);
-  });
+pool.connect((err, client, release) => {
+  if (err) {
+    return console.error("Error saat koneksi ke database:", err.stack);
+  }
+  console.log("Koneksi ke database PostgreSQL berhasil!");
+  client.release();
+});
 
 module.exports = pool;
