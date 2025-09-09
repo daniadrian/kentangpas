@@ -1,5 +1,5 @@
 const CalculatorModel = require("../models/calculator.model.js");
-const CalculatorService = require("../services/calculator.service.js");
+const { calculateSeedNeeds } = require("../services/calculator.service.js");
 
 const getRoot = (req, res) => {
   res.status(200).json({
@@ -10,9 +10,6 @@ const getRoot = (req, res) => {
   });
 };
 
-/**
- * @description Controller untuk mendapatkan semua parameter bibit
- */
 const getSeedParameters = async (req, res) => {
   try {
     const parameters = await CalculatorModel.getAllSeedParameters();
@@ -28,18 +25,35 @@ const getSeedParameters = async (req, res) => {
   }
 };
 
-/**
- * @description Controller untuk menjalankan kalkulasi kebutuhan bibit
- */
-const calculateSeeds = (req, res) => {
+const calculateSeeds = async (req, res) => {
   try {
-    const result = CalculatorService.calculateSeedNeeds(req.body);
-    res.status(200).json({
+    if (typeof req.body.generasiBibit === "string") {
+      req.body.generasiBibit = req.body.generasiBibit.toUpperCase();
+    }
+    if (typeof req.body.estimasiHargaUnit === "string") {
+      req.body.estimasiHargaUnit = req.body.estimasiHargaUnit.toLowerCase();
+    }
+
+    const dbParam = await CalculatorModel.getSeedParamByGeneration(
+      req.body.generasiBibit
+    );
+
+    const result = calculateSeedNeeds(req.body, dbParam);
+
+    if (result && result.error) {
+      return res.status(400).json({
+        message: "Input tidak valid.",
+        error: result.error,
+      });
+    }
+
+    return res.status(200).json({
       message: "Perhitungan berhasil dilakukan.",
       data: result,
     });
   } catch (error) {
-    res.status(500).json({
+    console.error("calculateSeeds error:", error);
+    return res.status(500).json({
       message: "Terjadi kesalahan pada server saat melakukan perhitungan.",
       error: error.message,
     });

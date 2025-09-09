@@ -12,24 +12,10 @@ model SeedParameters {
   generationName  String   @unique @map("generation_name")
   seedsPerKgMin   Int?     @map("seeds_per_kg_min")
   seedsPerKgMax   Int?     @map("seeds_per_kg_max")
-  pricePerUnitMin Int      @map("price_per_unit_min")
-  pricePerUnitMax Int      @map("price_per_unit_max")
+  pricePerUnitMin Int?     @map("price_per_unit_min")
+  pricePerUnitMax Int?     @map("price_per_unit_max")
   priceUnit       String   @map("price_unit")
   createdAt       DateTime @default(now()) @map("created_at")
 
   @@map("seed_parameters")
-}
-
-model Article {
-  id             Int      @id @default(autoincrement())
-  title          String   @unique
-  slug           String   @unique
-  bannerUrl      String   @map("banner_url")
-  author         String
-  publishedAt    DateTime @map("published_at")
-  articleContent String   @map("article_content")
-  createdAt      DateTime @default(now()) @map("created_at")
-  updatedAt      DateTime @updatedAt @map("updated_at")
-
-  @@map("articles")
 }
