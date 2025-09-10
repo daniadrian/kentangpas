@@ -1,31 +1,46 @@
+// index.js
 const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
-require("./models/db.js");
-const calculatorRoutes = require("./routes/calculator.routes.js");
-const articleRoutes = require("./routes/article.routes.js");
+
 const app = express();
+
+/** ------------ CORS ------------ **/
+/**
+ * ALLOWED_ORIGINS di .env bisa berisi beberapa origin, dipisah koma.
+ * Contoh:
+ *   http://localhost:3000,https://kentangpas.cloud,https://staging.kentangpas.cloud
+ */
 const allowed = (process.env.ALLOWED_ORIGINS || "")
   .split(",")
   .map((s) => s.trim())
   .filter(Boolean);
+
+/** Kalau ALLOWED_ORIGINS kosong -> izinkan semua (hati-hati, hanya untuk test) */
 const corsOptions = allowed.length
   ? {
       origin(origin, cb) {
-        if (!origin || allowed.includes(origin)) return cb(null, true);
-        return cb(new Error("CORS not allowed for this origin"), false);
+        // request tanpa Origin (curl/Postman) juga diizinkan
+        if (!origin) return cb(null, true);
+        if (allowed.includes(origin)) return cb(null, true);
+        return cb(new Error("CORS not allowed for: " + origin), false);
       },
-      methods: ["GET", "POST", "OPTIONS"],
+      methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
       allowedHeaders: ["Content-Type", "Authorization"],
-      maxAge: 86400,
+      credentials: false, // set true kalau pakai cookie/session
+      maxAge: 86400, // cache preflight 24 jam
     }
-  : {};
+  : {}; // default: semua origin
 
 app.use(cors(corsOptions));
 app.options("*", cors(corsOptions));
+/** ------------ END CORS ------------ **/
+
 app.use(express.json());
-app.use("/api", calculatorRoutes);
-app.use("/api/articles", articleRoutes);
+
+// routes kamu
+app.use("/api", require("./routes/calculator.routes.js"));
+app.use("/api/articles", require("./routes/article.routes.js"));
 
 module.exports = app;
 
