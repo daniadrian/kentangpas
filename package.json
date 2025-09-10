@@ -2,7 +2,7 @@
   "name": "kentangpas",
   "version": "1.0.0",
   "main": "index.js",
-  "scripts": {
+    "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
     "dev": "nodemon index.js",
@@ -22,13 +22,12 @@
   "description": "",
   "dependencies": {
     "@prisma/client": "^6.13.0",
-    "cors": "^2.8.5",
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
     "express-validator": "^7.2.1",
     "pg": "^8.16.3"
   },
-  "devDependencies": {
+    "devDependencies": {
     "nodemon": "^3.1.10"
   },
   "prisma": {
