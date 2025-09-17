@@ -33,10 +33,7 @@ app.use("/api", calculatorRoutes);
 app.use("/api/articles", articleRoutes);
 
 module.exports = app;
-
-if (process.env.NODE_ENV !== "production") {
-  const PORT = process.env.PORT || 5431;
-  app.listen(PORT, "127.0.0.1", () => {
-    console.log(`Server berjalan di http://127.0.0.1:${PORT}`);
-  });
-}
+const PORT = process.env.PORT || 5431;
+app.listen(PORT, "127.0.0.1", () => {
+  console.log(`Server berjalan di http://127.0.0.1:${PORT}`);
+});
