@@ -1,12 +1,15 @@
 const express = require("express");
 const cors = require("cors");
 const app = express();
-const allowList = ["https://kentangpas.site", "https://www.kentangpas.site"];
+const allowList = new Set([
+  "https://kentangpas.site",
+  "https://www.kentangpas.site",
+]);
 
 const corsOptions = {
   origin(origin, cb) {
     if (!origin) return cb(null, false);
-    cb(null, allowList.includes(origin));
+    cb(null, allowList.has(origin));
   },
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
@@ -15,13 +18,13 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.options("*", cors(corsOptions));
-
+app.options(/.*/, cors(corsOptions));
 app.use(express.json());
 app.get("/health", (req, res) => res.status(200).json({ ok: true }));
 
 const calculatorRoutes = require("./routes/calculator.routes.js");
 const articleRoutes = require("./routes/article.routes.js");
+
 app.use("/api", calculatorRoutes);
 app.use("/api/articles", articleRoutes);
 
