@@ -1,8 +1,3 @@
-/**
- * Kalkulasi kebutuhan bibit kentang (G0, G2, G3)
- * Mendukung harga per kg / kuintal (G3), fallback ke DB bila ada.
- */
-
 const DEFAULT_SEEDS_PER_KG = {
   G2: { min: 15, max: 15 },
   G3: { min: 12, max: 18 },
@@ -108,8 +103,8 @@ const calculateSeedNeeds = (params, dbParam = null) => {
     }
   } else {
     const seeds = mergeSeedsPerKg(gen, params.jumlahBibitPerKg, dbParam);
-    const kg_min = Math.ceil(T_pop / seeds.max); // umbi kecil → kg rendah
-    const kg_max = Math.ceil(T_pop / seeds.min); // umbi besar → kg tinggi
+    const kg_min = Math.ceil(T_pop / seeds.max);
+    const kg_max = Math.ceil(T_pop / seeds.min);
     const kg_est = Math.ceil((kg_min + kg_max) / 2);
 
     kebutuhanLabel = `${kg_est.toLocaleString("id-ID")} kg (${(
@@ -158,4 +153,78 @@ const calculateSeedNeeds = (params, dbParam = null) => {
   };
 };
 
-module.exports = { calculateSeedNeeds };
+const calculateReverseSeeds = (params) => {
+  const jumlahBibit = Number(params.jumlahBibit);
+  const jarakTanam = Number(params.jarakTanam) / 100;
+  const lebarGuludan = params.lebarGuludan ? Number(params.lebarGuludan) / 100 : 0.8;
+  const lebarParit = Number(params.lebarParit) / 100;
+  const gen = String(params.generasiBibit).toUpperCase();
+
+  if (
+    ![jumlahBibit, jarakTanam, lebarGuludan, lebarParit].every(
+      (v) => Number.isFinite(v) && v > 0
+    )
+  ) {
+    return {
+      error: "Input tidak valid. Pastikan semua angka diisi dengan benar.",
+    };
+  }
+
+  let totalTanaman;
+  let notePrefix;
+
+  if (gen === "G0") {
+    totalTanaman = jumlahBibit;
+    notePrefix = `Dengan ${totalTanaman.toLocaleString("id-ID")} biji bibit G0`;
+  } else if (gen === "G2" || gen === "G3") {
+    const jumlahPerKg = Number(params.jumlahPerKg);
+
+    if (!Number.isFinite(jumlahPerKg) || jumlahPerKg <= 0) {
+      return {
+        error: `Untuk generasi ${gen}, parameter jumlahPerKg wajib diisi dengan angka > 0.`,
+      };
+    }
+
+    totalTanaman = jumlahBibit * jumlahPerKg;
+    notePrefix = `Dengan ${jumlahBibit.toLocaleString("id-ID")} kg bibit ${gen} (estimasi ${jumlahPerKg} biji/kg = ${totalTanaman.toLocaleString("id-ID")} bibit)`;
+  } else {
+    return {
+      error: "Generasi bibit harus G0, G2, atau G3.",
+    };
+  }
+
+  const lebarUnitTanam = lebarGuludan + lebarParit;
+  const targetRasio = 1.5;
+
+  let jumlahGuludan = Math.round(
+    Math.sqrt(totalTanaman * jarakTanam / (targetRasio * lebarUnitTanam))
+  );
+
+  if (jumlahGuludan < 1) jumlahGuludan = 1;
+
+  const tanamanPerGuludan = Math.ceil(totalTanaman / jumlahGuludan);
+  const panjangPerGuludan = tanamanPerGuludan * jarakTanam;
+  const lebarLahan = jumlahGuludan * lebarUnitTanam;
+  const estimasiLuasM2 = panjangPerGuludan * lebarLahan;
+  const tanamanAktual = jumlahGuludan * tanamanPerGuludan;
+
+  return {
+    ringkasan: {
+      estimasiLuasM2: estimasiLuasM2.toLocaleString("id-ID", {
+        minimumFractionDigits: 1,
+        maximumFractionDigits: 1,
+      }),
+      jumlahGuludan: jumlahGuludan.toLocaleString("id-ID"),
+      panjangPerGuludan: panjangPerGuludan.toLocaleString("id-ID", {
+        minimumFractionDigits: 1,
+        maximumFractionDigits: 1,
+      }),
+    },
+    estimasiPopulasi: {
+      totalTanaman: tanamanAktual.toLocaleString("id-ID"),
+      note: `${notePrefix}, Anda dapat menanam lahan seluas ${estimasiLuasM2.toFixed(1)} m² dengan jarak tanam ${(jarakTanam * 100).toFixed(0)} cm.`,
+    },
+  };
+};
+
+module.exports = { calculateSeedNeeds, calculateReverseSeeds };

@@ -1,5 +1,5 @@
 const CalculatorModel = require("../models/calculator.model.js");
-const { calculateSeedNeeds } = require("../services/calculator.service.js");
+const { calculateSeedNeeds, calculateReverseSeeds } = require("../services/calculator.service.js");
 
 const getRoot = (req, res) => {
   res.status(200).json({
@@ -60,8 +60,37 @@ const calculateSeeds = async (req, res) => {
   }
 };
 
+const calculateReverseSeedsController = async (req, res) => {
+  try {
+    if (typeof req.body.generasiBibit === "string") {
+      req.body.generasiBibit = req.body.generasiBibit.toUpperCase();
+    }
+
+    const result = calculateReverseSeeds(req.body);
+
+    if (result && result.error) {
+      return res.status(400).json({
+        message: result.error,
+        data: null,
+      });
+    }
+
+    return res.status(200).json({
+      message: "Perhitungan reverse berhasil",
+      data: result,
+    });
+  } catch (error) {
+    console.error("calculateReverseSeedsController error:", error);
+    return res.status(500).json({
+      message: "Terjadi kesalahan pada server saat melakukan perhitungan reverse.",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   getRoot,
   getSeedParameters,
   calculateSeeds,
+  calculateReverseSeedsController,
 };
