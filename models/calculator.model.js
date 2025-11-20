@@ -1,8 +1,5 @@
 const pool = require("./db.js");
 
-/**
- * @description Ambil semua parameter bibit (untuk admin/monitoring)
- */
 const getAllSeedParameters = async () => {
   try {
     const query = `
@@ -25,11 +22,6 @@ const getAllSeedParameters = async () => {
   }
 };
 
-/**
- * @description Ambil parameter bibit berdasarkan generasi (G0/G2/G3)
- * @param {string} generationName
- * @returns {Promise<Object|null>}
- */
 const getSeedParamByGeneration = async (generationName) => {
   try {
     const query = `

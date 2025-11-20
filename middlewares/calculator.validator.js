@@ -78,7 +78,57 @@ const validate = (req, res, next) => {
   });
 };
 
+const calculateReverseRules = () => {
+  return [
+    body("generasiBibit")
+      .exists()
+      .withMessage("Generasi bibit wajib diisi.")
+      .isIn(["G0", "G2", "G3"])
+      .withMessage("Generasi harus G0, G2, atau G3."),
+
+    body("jumlahBibit")
+      .custom(isPositiveNumber)
+      .withMessage("Jumlah bibit harus angka > 0 (biji untuk G0, kg untuk G2/G3)."),
+
+    body("jumlahPerKg")
+      .optional({ nullable: true })
+      .custom((val, { req }) => {
+        const gen = String(req.body.generasiBibit || "").toUpperCase();
+
+        if (gen === "G0") {
+          return true;
+        }
+
+        if (gen === "G2" || gen === "G3") {
+          if (val === undefined || val === null || val === "") {
+            throw new Error(`Untuk generasi ${gen}, parameter jumlahPerKg wajib diisi.`);
+          }
+          if (!isPositiveNumber(val)) {
+            throw new Error("jumlahPerKg harus angka > 0 (jumlah umbi per kg).");
+          }
+        }
+
+        return true;
+      })
+      .withMessage("Validasi jumlahPerKg gagal."),
+
+    body("jarakTanam")
+      .custom(isPositiveNumber)
+      .withMessage("Jarak tanam harus angka > 0 (cm)."),
+
+    body("lebarGuludan")
+      .optional({ nullable: true })
+      .custom(isPositiveNumber)
+      .withMessage("Lebar guludan harus angka > 0 (cm)."),
+
+    body("lebarParit")
+      .custom(isPositiveNumber)
+      .withMessage("Lebar parit (gerandul) harus angka > 0 (cm)."),
+  ];
+};
+
 module.exports = {
   calculateRules,
+  calculateReverseRules,
   validate,
 };
