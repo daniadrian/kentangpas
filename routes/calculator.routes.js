@@ -9,14 +9,23 @@ const {
 
 router.get("/", calculatorController.getRoot);
 router.get("/parameters", calculatorController.getSeedParameters);
+
 router.post(
-  "/calculate",
+  "/calculator",
   calculateRules(),
   validate,
   calculatorController.calculateSeeds
 );
+
 router.post(
-  "/calculate/reverse",
+  "/calculator/generate",
+  calculateRules(),
+  validate,
+  calculatorController.calculateSeeds
+);
+
+router.post(
+  "/calculator/reverse",
   calculateReverseRules(),
   validate,
   calculatorController.calculateReverseSeedsController
