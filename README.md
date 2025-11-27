@@ -4,7 +4,6 @@
 [![Express](https://img.shields.io/badge/Express-5.1.0-blue.svg)](https://expressjs.com/)
 [![Prisma](https://img.shields.io/badge/Prisma-6.13.0-2D3748.svg)](https://www.prisma.io/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Database-336791.svg)](https://www.postgresql.org/)
-[![License: ISC](https://img.shields.io/badge/License-ISC-yellow.svg)](LICENSE)
 
 > **API Backend untuk Aplikasi Kalkulator Bibitku**
 > Dikembangkan oleh Laboratorium Sistem Informasi - Universitas Brawijaya
