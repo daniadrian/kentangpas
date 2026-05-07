@@ -1,12 +1,27 @@
 require("dotenv").config();
+
+const REQUIRED_ENV = ["DATABASE_URL"];
+for (const key of REQUIRED_ENV) {
+  if (!process.env[key]) {
+    console.error(`Missing required environment variable: ${key}`);
+    process.exit(1);
+  }
+}
+
 const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
+const prisma = require("./lib/prisma");
 
 const app = express();
 
+const envOrigins = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(",").map((o) => o.trim())
+  : [];
+
 const allowList = new Set([
+  ...envOrigins,
   "https://kentangpas.site",
   "https://www.kentangpas.site",
   "http://bibitku.filkom.ub.ac.id",
@@ -20,7 +35,7 @@ const allowList = new Set([
 
 const corsOptions = {
   origin(origin, cb) {
-    if (!origin) return cb(null, false);
+    if (!origin) return cb(null, true);
     cb(null, allowList.has(origin));
   },
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
@@ -57,10 +72,8 @@ app.get("/health", (req, res) => {
 });
 
 const calculatorRoutes = require("./routes/calculator.routes.js");
-const articleRoutes = require("./routes/article.routes.js");
 
 app.use("/api", calculatorRoutes);
-app.use("/api/articles", articleRoutes);
 
 app.use((req, res) => {
   res.status(404).json({
@@ -87,3 +100,11 @@ app.listen(PORT, "0.0.0.0", () => {
   console.log(`📍 Environment: ${process.env.NODE_ENV || "development"}`);
   console.log(`🔗 Health check: http://localhost:${PORT}/health`);
 });
+
+const shutdown = async () => {
+  await prisma.$disconnect();
+  process.exit(0);
+};
+
+process.on("SIGTERM", shutdown);
+process.on("SIGINT", shutdown);
