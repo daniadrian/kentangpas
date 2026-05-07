@@ -21,8 +21,8 @@ function mergeSeedsPerKg(gen, fromUser, fromDb) {
     if (single) uMin = uMax = single;
   }
 
-  const dMin = toNum(fromDb?.seeds_per_kg_min);
-  const dMax = toNum(fromDb?.seeds_per_kg_max);
+  const dMin = toNum(fromDb?.seedsPerKgMin);
+  const dMax = toNum(fromDb?.seedsPerKgMax);
   const hard = DEFAULT_SEEDS_PER_KG[G] || { min: 12, max: 18 };
 
   const min = uMin ?? dMin ?? hard.min;
@@ -90,8 +90,8 @@ const calculateSeedNeeds = (params, dbParam = null) => {
       gen,
       params.estimasiHarga,
       "biji",
-      dbParam?.price_per_unit_min,
-      dbParam?.price_per_unit_max,
+      dbParam?.pricePerUnitMin,
+      dbParam?.pricePerUnitMax,
       "biji"
     );
     if (price.mode === "single") {
@@ -118,9 +118,9 @@ const calculateSeedNeeds = (params, dbParam = null) => {
       gen,
       params.estimasiHarga,
       params.estimasiHargaUnit,
-      dbParam?.price_per_unit_min,
-      dbParam?.price_per_unit_max,
-      dbParam?.unit
+      dbParam?.pricePerUnitMin,
+      dbParam?.pricePerUnitMax,
+      dbParam?.priceUnit
     );
     if (price.mode === "single") {
       biayaLabel = `Rp ${(price.priceKg * kg_est).toLocaleString("id-ID")}`;

@@ -18,13 +18,6 @@ router.post(
 );
 
 router.post(
-  "/calculator/generate",
-  calculateRules(),
-  validate,
-  calculatorController.calculateSeeds
-);
-
-router.post(
   "/calculator/reverse",
   calculateReverseRules(),
   validate,

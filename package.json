@@ -20,18 +20,21 @@
   },
   "homepage": "https://github.com/daniadrian/kentangpas#readme",
   "description": "",
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "dependencies": {
-    "@prisma/client": "^6.13.0",
-    "cors": "^2.8.5",
-    "dotenv": "^17.2.1",
-    "express": "^5.1.0",
-    "express-rate-limit": "^8.2.1",
-    "express-validator": "^7.2.1",
-    "helmet": "^8.1.0",
-    "pg": "^8.16.3"
+    "@prisma/client": "^6.19.3",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "express-rate-limit": "^8.5.1",
+    "express-validator": "^7.3.2",
+    "helmet": "^8.1.0"
   },
   "devDependencies": {
-    "nodemon": "^3.1.10"
+    "nodemon": "^3.1.14",
+    "prisma": "^6.19.3"
   },
   "prisma": {
     "seed": "node prisma/seed.js"
