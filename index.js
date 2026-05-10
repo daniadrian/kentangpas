@@ -44,9 +44,9 @@ const corsOptions = {
   optionsSuccessStatus: 204,
 };
 
-app.use(helmet());
-app.use(cors(corsOptions));
 app.options(/.*/, cors(corsOptions));
+app.use(cors(corsOptions));
+app.use(helmet());
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
