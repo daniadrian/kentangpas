@@ -99,7 +99,7 @@ Menghitung estimasi biaya bibit berdasarkan:
 ### Struktur MVC (Model-View-Controller)
 
 ```
-kentangpas/
+bibitku/
 ├── controllers/          # Business logic & request handling
 │   └── calculator.controller.js
 ├── services/            # Core calculation & business logic
