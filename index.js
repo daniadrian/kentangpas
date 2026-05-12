@@ -22,12 +22,8 @@ const envOrigins = process.env.ALLOWED_ORIGINS
 
 const allowList = new Set([
   ...envOrigins,
-  "https://kentangpas.site",
-  "https://www.kentangpas.site",
-  "http://bibitku.filkom.ub.ac.id",
-  "https://bibitku.filkom.ub.ac.id",
-  "http://api-bibitku.filkom.ub.ac.id",
-  "https://api-bibitku.filkom.ub.ac.id",
+  "https://bibitku.site",
+  "https://www.bibitku.site",
   "http://10.34.0.33",
   "http://localhost:3000",
   "http://localhost:5173",

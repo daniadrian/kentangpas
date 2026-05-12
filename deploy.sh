@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-echo "🚀 Starting kentangpas backend deployment..."
+echo "🚀 Starting bibitku backend deployment..."
 
 cd /var/www/bibitku-be
 
