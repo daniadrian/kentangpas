@@ -1,5 +1,4 @@
-const CalculatorModel = require("../models/calculator.model.js");
-const { calculateSeedNeeds, calculateReverseSeeds } = require("../services/calculator.service.js");
+const CalculatorService = require("../services/calculator.service.js");
 
 const getRoot = (req, res) => {
   res.status(200).json({
@@ -13,7 +12,7 @@ const getRoot = (req, res) => {
 
 const getSeedParameters = async (req, res) => {
   try {
-    const parameters = await CalculatorModel.getAllSeedParameters();
+    const parameters = await CalculatorService.getAllSeedParameters();
     res.status(200).json({
       success: true,
       message: "Data parameter bibit berhasil diambil",
@@ -37,11 +36,7 @@ const calculateSeeds = async (req, res) => {
       req.body.estimasiHargaUnit = req.body.estimasiHargaUnit.toLowerCase();
     }
 
-    const dbParam = await CalculatorModel.getSeedParamByGeneration(
-      req.body.generasiBibit
-    );
-
-    const result = calculateSeedNeeds(req.body, dbParam);
+    const result = await CalculatorService.calculateSeedNeeds(req.body);
 
     if (result && result.error) {
       return res.status(400).json({
@@ -72,7 +67,7 @@ const calculateReverseSeedsController = async (req, res) => {
       req.body.generasiBibit = req.body.generasiBibit.toUpperCase();
     }
 
-    const result = calculateReverseSeeds(req.body);
+    const result = await CalculatorService.calculateReverseSeeds(req.body);
 
     if (result && result.error) {
       return res.status(400).json({

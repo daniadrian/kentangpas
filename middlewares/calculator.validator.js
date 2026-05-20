@@ -92,22 +92,11 @@ const calculateReverseRules = () => {
 
     body("jumlahPerKg")
       .optional({ nullable: true })
-      .custom((val, { req }) => {
-        const gen = String(req.body.generasiBibit || "").toUpperCase();
-
-        if (gen === "G0") {
-          return true;
+      .custom((val) => {
+        if (val === undefined || val === null || val === "") return true;
+        if (!isPositiveNumber(val)) {
+          throw new Error("jumlahPerKg harus angka > 0 (jumlah umbi per kg).");
         }
-
-        if (gen === "G2" || gen === "G3") {
-          if (val === undefined || val === null || val === "") {
-            throw new Error(`Untuk generasi ${gen}, parameter jumlahPerKg wajib diisi.`);
-          }
-          if (!isPositiveNumber(val)) {
-            throw new Error("jumlahPerKg harus angka > 0 (jumlah umbi per kg).");
-          }
-        }
-
         return true;
       })
       .withMessage("Validasi jumlahPerKg gagal."),
