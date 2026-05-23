@@ -6,105 +6,77 @@ class CalculatorService {
     return repository.getAllSeedParameters();
   }
 
-  async calculateSeedNeeds(params) {
-    const L = Number(params.panjangLahan);
-    const W_field = Number(params.lebarLahan);
-    const W_ridge = params.lebarGuludan ? Number(params.lebarGuludan) / 100 : 0.8;
-    const W_furrow = Number(params.lebarParit) / 100;
-    const s = Number(params.jarakTanam) / 100;
-    const gen = String(params.generasiBibit).toUpperCase();
-
-    if (
-      ![L, W_field, W_ridge, W_furrow, s].every(
-        (v) => Number.isFinite(v) && v > 0
-      )
-    ) {
-      return {
-        error: "Input tidak valid. Pastikan semua angka diisi dengan benar.",
-      };
-    }
-
-    const dbParam = await repository.getSeedParamByGeneration(gen);
-
+  _computePlantingGrid(dto) {
+    const L = dto.panjangLahan;
+    const W_field = dto.lebarLahan;
+    const W_ridge = dto.lebarGuludan / 100;
+    const W_furrow = dto.lebarParit / 100;
+    const s = dto.jarakTanam / 100;
     const U = W_ridge + W_furrow;
-    let J = Math.floor(W_field / U);
+    const J = Math.floor(W_field / U);
     const sisa = W_field - J * U;
-    const ridgeMin = 0.75;
-    const J_final = J + (sisa >= ridgeMin ? 1 : 0);
-
+    const J_final = J + (sisa >= 0.75 ? 1 : 0);
     const T_row = Math.floor(L / s) + 1;
-    const T_pop = J_final * T_row * 1;
+    const T_pop = J_final * T_row;
+    return { U, J_final, T_row, T_pop };
+  }
 
-    let kebutuhanLabel,
-      note,
-      detailKg = null;
-    let unitBibit = gen === "G0" ? "biji" : "kg";
+  _calcReverseDimensions(totalTanaman, jarakTanam, lebarUnitTanam) {
+    const targetRasio = 1.5;
+    let jumlahGuludan = Math.round(
+      Math.sqrt((totalTanaman * jarakTanam) / (targetRasio * lebarUnitTanam))
+    );
+    if (jumlahGuludan < 1) jumlahGuludan = 1;
+    const tanamanPerGuludan = Math.ceil(totalTanaman / jumlahGuludan);
+    const panjangPerGuludan = tanamanPerGuludan * jarakTanam;
+    const lebarLahan = jumlahGuludan * lebarUnitTanam;
+    const luasM2 = panjangPerGuludan * lebarLahan;
+    const tanamanAktual = jumlahGuludan * tanamanPerGuludan;
+    return { jumlahGuludan, tanamanPerGuludan, panjangPerGuludan, lebarLahan, luasM2, tanamanAktual };
+  }
+
+  async _calculateSeedNeedsKg(dto, gen) {
+    const data = await repository.getSeedParamByGeneration(gen);
+    const { U, J_final, T_row, T_pop } = this._computePlantingGrid(dto);
+
+    const seeds = mergeSeedsPerKg(gen, dto.jumlahBibitPerKg, data);
+    const kg_min = Math.ceil(T_pop / seeds.max);
+    const kg_max = Math.ceil(T_pop / seeds.min);
+    const kg_est = Math.ceil((kg_min + kg_max) / 2);
+
+    const price = mergePrice(
+      gen,
+      dto.estimasiHarga,
+      dto.estimasiHargaUnit,
+      data?.pricePerUnitMin,
+      data?.pricePerUnitMax,
+      data?.priceUnit
+    );
+
     let biayaLabel = "Tidak dihitung";
-
-    if (gen === "G0") {
-      kebutuhanLabel = `${T_pop.toLocaleString("id-ID")} biji`;
-      note = "Unit biji (G0). Harga per kg tidak berlaku.";
-
-      const price = mergePrice(
-        gen,
-        params.estimasiHarga,
-        "biji",
-        dbParam?.pricePerUnitMin,
-        dbParam?.pricePerUnitMax,
-        "biji"
-      );
-      if (price.mode === "single") {
-        biayaLabel = `Rp ${(price.priceKg * T_pop).toLocaleString("id-ID")}`;
-      } else if (price.mode === "range") {
-        biayaLabel = `Rp ${(price.minKg * T_pop).toLocaleString("id-ID")} - Rp ${(
-          price.maxKg * T_pop
-        ).toLocaleString("id-ID")}`;
-      }
-    } else {
-      const seeds = mergeSeedsPerKg(gen, params.jumlahBibitPerKg, dbParam);
-      const kg_min = Math.ceil(T_pop / seeds.max);
-      const kg_max = Math.ceil(T_pop / seeds.min);
-      const kg_est = Math.ceil((kg_min + kg_max) / 2);
-
-      kebutuhanLabel = `${kg_est.toLocaleString("id-ID")} kg (${(
-        kg_est / 100
-      ).toFixed(2)} kuintal)`;
-      note =
-        "Angka perkiraan. Kebutuhan bisa lebih sedikit/lebih banyak tergantung ukuran umbi (biji/kg).";
-      detailKg = { kg_min, kg_est, kg_max };
-
-      const price = mergePrice(
-        gen,
-        params.estimasiHarga,
-        params.estimasiHargaUnit,
-        dbParam?.pricePerUnitMin,
-        dbParam?.pricePerUnitMax,
-        dbParam?.priceUnit
-      );
-      if (price.mode === "single") {
-        biayaLabel = `Rp ${(price.priceKg * kg_est).toLocaleString("id-ID")}`;
-      } else if (price.mode === "range") {
-        biayaLabel = `Rp ${(price.minKg * kg_est).toLocaleString(
-          "id-ID"
-        )} - Rp ${(price.maxKg * kg_est).toLocaleString("id-ID")}`;
-      }
+    if (price.mode === "single") {
+      biayaLabel = `Rp ${(price.priceKg * kg_est).toLocaleString("id-ID")}`;
+    } else if (price.mode === "range") {
+      biayaLabel = `Rp ${(price.minKg * kg_est).toLocaleString("id-ID")} - Rp ${(
+        price.maxKg * kg_est
+      ).toLocaleString("id-ID")}`;
     }
 
     return {
       ringkasanLahan: {
         lebarUnitTanam: `${U.toFixed(2)} meter`,
         jumlahGuludan: `${J_final} baris`,
-        panjangTanamPerGuludan: `${L.toFixed(2)} meter`,
+        panjangTanamPerGuludan: `${dto.panjangLahan.toFixed(2)} meter`,
       },
       kebutuhanTanam: {
         jumlahTanamanPerGuludan: `${T_row} pohon`,
         totalPopulasiTanaman: `${T_pop.toLocaleString("id-ID")} pohon`,
       },
       kebutuhanBibit: {
-        estimasi: kebutuhanLabel,
-        unit: unitBibit,
-        rangeKg: detailKg,
-        note,
+        estimasi: `${kg_est.toLocaleString("id-ID")} kg (${(kg_est / 100).toFixed(2)} kuintal)`,
+        unit: "kg",
+        rangeKg: { kg_min, kg_est, kg_max },
+        note: "Angka perkiraan. Kebutuhan bisa lebih sedikit/lebih banyak tergantung ukuran umbi (biji/kg).",
       },
       estimasiBiaya: {
         total: biayaLabel,
@@ -112,77 +84,68 @@ class CalculatorService {
     };
   }
 
-  async calculateReverseSeeds(params) {
-    const jumlahBibit = Number(params.jumlahBibit);
-    const jarakTanam = Number(params.jarakTanam) / 100;
-    const lebarGuludan = params.lebarGuludan ? Number(params.lebarGuludan) / 100 : 0.8;
-    const lebarParit = Number(params.lebarParit) / 100;
-    const gen = String(params.generasiBibit).toUpperCase();
-
-    if (
-      ![jumlahBibit, jarakTanam, lebarGuludan, lebarParit].every(
-        (v) => Number.isFinite(v) && v > 0
-      )
-    ) {
-      return {
-        error: "Input tidak valid. Pastikan semua angka diisi dengan benar.",
-      };
-    }
-
-    const dbParam = await repository.getSeedParamByGeneration(gen);
-
-    let totalTanamanMin, totalTanamanMax;
-    let notePrefix;
-
-    if (gen === "G0") {
-      totalTanamanMin = totalTanamanMax = jumlahBibit;
-      notePrefix = `Dengan ${jumlahBibit.toLocaleString("id-ID")} biji bibit G0`;
-    } else if (gen === "G2" || gen === "G3") {
-      const seeds = mergeSeedsPerKg(gen, params.jumlahPerKg, dbParam);
-
-      totalTanamanMin = jumlahBibit * seeds.min;
-      totalTanamanMax = jumlahBibit * seeds.max;
-
-      const seedsLabel =
-        seeds.min === seeds.max
-          ? `${seeds.min} biji/kg`
-          : `${seeds.min}–${seeds.max} biji/kg`;
-      notePrefix = `Dengan ${jumlahBibit.toLocaleString("id-ID")} kg bibit ${gen} (estimasi ${seedsLabel})`;
-    } else {
-      return {
-        error: "Generasi bibit harus G0, G2, atau G3.",
-      };
-    }
-
+  async _calculateReverseSeedsKg(dto, gen) {
+    const jumlahBibit = dto.jumlahBibit;
+    const jarakTanam = dto.jarakTanam / 100;
+    const lebarGuludan = dto.lebarGuludan / 100;
+    const lebarParit = dto.lebarParit / 100;
     const lebarUnitTanam = lebarGuludan + lebarParit;
-    const targetRasio = 1.5;
 
-    const calcDimensions = (totalTanaman) => {
-      let jumlahGuludan = Math.round(
-        Math.sqrt((totalTanaman * jarakTanam) / (targetRasio * lebarUnitTanam))
-      );
-      if (jumlahGuludan < 1) jumlahGuludan = 1;
+    const data = await repository.getSeedParamByGeneration(gen);
+    const seeds = mergeSeedsPerKg(gen, dto.jumlahPerKg, data);
 
-      const tanamanPerGuludan = Math.ceil(totalTanaman / jumlahGuludan);
-      const panjangPerGuludan = tanamanPerGuludan * jarakTanam;
-      const lebarLahan = jumlahGuludan * lebarUnitTanam;
-      const luasM2 = panjangPerGuludan * lebarLahan;
-      const tanamanAktual = jumlahGuludan * tanamanPerGuludan;
+    const totalTanamanMin = jumlahBibit * seeds.min;
+    const totalTanamanMax = jumlahBibit * seeds.max;
 
-      return { jumlahGuludan, tanamanPerGuludan, panjangPerGuludan, lebarLahan, luasM2, tanamanAktual };
-    };
+  let seedsLabel;
 
-    const isRange = totalTanamanMin !== totalTanamanMax;
-    const dimMin = calcDimensions(totalTanamanMin);
-    const dimMax = isRange ? calcDimensions(totalTanamanMax) : dimMin;
+  if (seeds.min === seeds.max) {
+    seedsLabel = `${seeds.min} biji/kg`;
+} else {
+  seedsLabel = `${seeds.min}–${seeds.max} biji/kg`;
+}
 
-    const fmt1 = (n) => n.toLocaleString("id-ID", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
-    const jarakLabel = `${(jarakTanam * 100).toFixed(0)} cm`;
+const notePrefix =
+  `Dengan ${jumlahBibit.toLocaleString("id-ID")} kg bibit ${gen} ` +
+  `(estimasi ${seedsLabel})`;
 
-    const luasLabel = isRange
-      ? `${dimMin.luasM2.toFixed(1)}–${dimMax.luasM2.toFixed(1)} m²`
-      : `${dimMin.luasM2.toFixed(1)} m²`;
+const isRange = totalTanamanMin !== totalTanamanMax;
 
+const dimMin = this._calcReverseDimensions(
+  totalTanamanMin,
+  jarakTanam,
+  lebarUnitTanam
+);
+
+let dimMax;
+
+if (isRange) {
+  dimMax = this._calcReverseDimensions(
+    totalTanamanMax,
+    jarakTanam,
+    lebarUnitTanam
+  );
+} else {
+  dimMax = dimMin;
+}
+
+const fmt1 = (n) =>
+  n.toLocaleString("id-ID", {
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
+  });
+
+const jarakLabel = `${(jarakTanam * 100).toFixed(0)} cm`;
+
+let luasLabel;
+
+if (isRange) {
+  luasLabel =
+    `${dimMin.luasM2.toFixed(1)}–` +
+    `${dimMax.luasM2.toFixed(1)} m²`;
+} else {
+  luasLabel = `${dimMin.luasM2.toFixed(1)} m²`;
+}
     return {
       ringkasan: {
         estimasiLuasM2: isRange
@@ -202,6 +165,113 @@ class CalculatorService {
         note: `${notePrefix}, estimasi lahan yang dibutuhkan ${luasLabel} dengan jarak tanam ${jarakLabel}.`,
       },
     };
+  }
+
+  async calculateSeedNeedsG0(dto) {
+    const data = await repository.getSeedParamByGeneration("G0");
+    const { U, J_final, T_row, T_pop } = this._computePlantingGrid(dto);
+
+    const price = mergePrice(
+      "G0",
+      dto.estimasiHarga,
+      "biji",
+      data?.pricePerUnitMin,
+      data?.pricePerUnitMax,
+      "biji"
+    );
+
+    let biayaLabel = "Tidak dihitung";
+    if (price.mode === "single") {
+      biayaLabel = `Rp ${(price.priceKg * T_pop).toLocaleString("id-ID")}`;
+    } else if (price.mode === "range") {
+      biayaLabel = `Rp ${(price.minKg * T_pop).toLocaleString("id-ID")} - Rp ${(
+        price.maxKg * T_pop
+      ).toLocaleString("id-ID")}`;
+    }
+
+    return {
+      ringkasanLahan: {
+        lebarUnitTanam: `${U.toFixed(2)} meter`,
+        jumlahGuludan: `${J_final} baris`,
+        panjangTanamPerGuludan: `${dto.panjangLahan.toFixed(2)} meter`,
+      },
+      kebutuhanTanam: {
+        jumlahTanamanPerGuludan: `${T_row} pohon`,
+        totalPopulasiTanaman: `${T_pop.toLocaleString("id-ID")} pohon`,
+      },
+      kebutuhanBibit: {
+        estimasi: `${T_pop.toLocaleString("id-ID")} biji`,
+        unit: "biji",
+        rangeKg: null,
+        note: "Unit biji (G0). Harga per kg tidak berlaku.",
+      },
+      estimasiBiaya: {
+        total: biayaLabel,
+      },
+    };
+  }
+
+  async calculateSeedNeedsG2(dto) {
+    return this._calculateSeedNeedsKg(dto, "G2");
+  }
+
+  async calculateSeedNeedsG3(dto) {
+    return this._calculateSeedNeedsKg(dto, "G3");
+  }
+
+  async calculateReverseSeedsG0(dto) {
+    const data = await repository.getSeedParamByGeneration(dto.generasiBibit);
+    const jumlahBibit = dto.jumlahBibit;
+    const jarakTanam = dto.jarakTanam / 100;
+    const lebarGuludan = dto.lebarGuludan / 100;
+    const lebarParit = dto.lebarParit / 100;
+    const lebarUnitTanam = lebarGuludan + lebarParit;
+
+    const dim = this._calcReverseDimensions(jumlahBibit, jarakTanam, lebarUnitTanam);
+    const fmt1 = (n) =>
+      n.toLocaleString("id-ID", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+    const jarakLabel = `${(jarakTanam * 100).toFixed(0)} cm`;
+
+    const price = mergePrice(
+      dto.generasiBibit,
+      null,
+      null,
+      data?.pricePerUnitMin,
+      data?.pricePerUnitMax,
+      "biji"
+    );
+
+    let biayaLabel = "Tidak dihitung";
+    if (price.mode === "single") {
+      biayaLabel = `Rp ${(price.priceKg * jumlahBibit).toLocaleString("id-ID")}`;
+    } else if (price.mode === "range") {
+      biayaLabel = `Rp ${(price.minKg * jumlahBibit).toLocaleString("id-ID")} - Rp ${(
+        price.maxKg * jumlahBibit
+      ).toLocaleString("id-ID")}`;
+    }
+
+    return {
+      ringkasan: {
+        estimasiLuasM2: fmt1(dim.luasM2),
+        jumlahGuludan: dim.jumlahGuludan.toLocaleString("id-ID"),
+        panjangPerGuludan: fmt1(dim.panjangPerGuludan),
+      },
+      estimasiPopulasi: {
+        totalTanaman: dim.tanamanAktual.toLocaleString("id-ID"),
+        note: `Dengan ${jumlahBibit.toLocaleString("id-ID")} biji bibit G0, estimasi lahan yang dibutuhkan ${dim.luasM2.toFixed(1)} m² dengan jarak tanam ${jarakLabel}.`,
+      },
+      estimasiBiaya: {
+        total: biayaLabel,
+      },
+    };
+  }
+
+  async calculateReverseSeedsG2(dto) {
+    return this._calculateReverseSeedsKg(dto, "G2");
+  }
+
+  async calculateReverseSeedsG3(dto) {
+    return this._calculateReverseSeedsKg(dto, "G3");
   }
 }
 

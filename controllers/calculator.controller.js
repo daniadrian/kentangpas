@@ -27,24 +27,25 @@ const getSeedParameters = async (req, res) => {
   }
 };
 
+const SEED_NEEDS_HANDLERS = {
+  G0: (dto) => CalculatorService.calculateSeedNeedsG0(dto),
+  G2: (dto) => CalculatorService.calculateSeedNeedsG2(dto),
+  G3: (dto) => CalculatorService.calculateSeedNeedsG3(dto),
+};
+
 const calculateSeeds = async (req, res) => {
   try {
-    if (typeof req.body.generasiBibit === "string") {
-      req.body.generasiBibit = req.body.generasiBibit.toUpperCase();
-    }
-    if (typeof req.body.estimasiHargaUnit === "string") {
-      req.body.estimasiHargaUnit = req.body.estimasiHargaUnit.toLowerCase();
-    }
+    const gen = req.dto.generasiBibit;
+    const handler = SEED_NEEDS_HANDLERS[gen];
 
-    const result = await CalculatorService.calculateSeedNeeds(req.body);
-
-    if (result && result.error) {
+    if (!handler) {
       return res.status(400).json({
         success: false,
-        message: "Input tidak valid.",
-        error: result.error,
+        message: `Generasi bibit tidak dikenali: ${gen}`,
       });
     }
+
+    const result = await handler(req.dto);
 
     return res.status(200).json({
       success: true,
@@ -61,21 +62,25 @@ const calculateSeeds = async (req, res) => {
   }
 };
 
+const REVERSE_SEEDS_HANDLERS = {
+  G0: (dto) => CalculatorService.calculateReverseSeedsG0(dto),
+  G2: (dto) => CalculatorService.calculateReverseSeedsG2(dto),
+  G3: (dto) => CalculatorService.calculateReverseSeedsG3(dto),
+};
+
 const calculateReverseSeedsController = async (req, res) => {
   try {
-    if (typeof req.body.generasiBibit === "string") {
-      req.body.generasiBibit = req.body.generasiBibit.toUpperCase();
-    }
+    const gen = req.dto.generasiBibit;
+    const handler = REVERSE_SEEDS_HANDLERS[gen];
 
-    const result = await CalculatorService.calculateReverseSeeds(req.body);
-
-    if (result && result.error) {
+    if (!handler) {
       return res.status(400).json({
         success: false,
-        message: result.error,
-        data: null,
+        message: `Generasi bibit tidak dikenali: ${gen}`,
       });
     }
+
+    const result = await handler(req.dto);
 
     return res.status(200).json({
       success: true,
