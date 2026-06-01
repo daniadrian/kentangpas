@@ -1,8 +1,8 @@
 # API Kalkulator Bibitku
 
-[![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org/)
-[![Express](https://img.shields.io/badge/Express-5.1.0-blue.svg)](https://expressjs.com/)
-[![Prisma](https://img.shields.io/badge/Prisma-6.13.0-2D3748.svg)](https://www.prisma.io/)
+[![Node.js](https://img.shields.io/badge/Node.js-20+-green.svg)](https://nodejs.org/)
+[![Express](https://img.shields.io/badge/Express-5.2.1-blue.svg)](https://expressjs.com/)
+[![Prisma](https://img.shields.io/badge/Prisma-6.19.3-2D3748.svg)](https://www.prisma.io/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Database-336791.svg)](https://www.postgresql.org/)
 
 > **API Backend untuk Aplikasi Kalkulator Bibitku**
@@ -10,151 +10,146 @@
 
 ---
 
-## 📋 Deskripsi Project
+## Deskripsi Project
 
-**API Kalkulator Bibitku** adalah sistem backend berbasis RESTful API yang dirancang untuk mendukung aplikasi kalkulator pertanian kentang. API ini menyediakan perhitungan kebutuhan bibit kentang berdasarkan parameter lahan pertanian, mendukung berbagai generasi bibit (G0, G2, G3), serta menyediakan fitur perhitungan maju (forward) dan terbalik (reverse) untuk membantu petani dalam perencanaan budidaya kentang.
+**API Kalkulator Bibitku** adalah sistem backend berbasis RESTful API untuk mendukung aplikasi kalkulator pertanian kentang. API ini menyediakan perhitungan kebutuhan bibit berdasarkan parameter lahan, mendukung tiga generasi bibit (G0, G2, G3), serta fitur perhitungan maju (forward) dan terbalik (reverse) untuk membantu petani dalam perencanaan budidaya.
 
-Project ini merupakan bagian dari penelitian dan pengembangan sistem informasi pertanian yang dikembangkan oleh **Laboratorium Sistem Informasi, Fakultas Ilmu Komputer, Universitas Brawijaya**.
-
-### 🎯 Tujuan Project
-
-1. **Akademis**: Menyediakan platform untuk penelitian dan pengembangan sistem informasi pertanian
-2. **Praktis**: Membantu petani dalam menghitung kebutuhan bibit kentang secara akurat
-3. **Edukasi**: Memberikan pembelajaran tentang teknologi web API dalam konteks pertanian
-4. **Keberlanjutan**: Membangun sistem yang dapat dikembangkan dan dipelihara oleh generasi berikutnya
+Project ini merupakan bagian dari kegiatan penelitian dan pengembangan di **Laboratorium Sistem Informasi, Fakultas Ilmu Komputer, Universitas Brawijaya**.
 
 ---
 
-## ✨ Fitur Utama
+## Fitur Utama
 
-### 1. Perhitungan Kebutuhan Bibit (Forward Calculation)
+### 1. Perhitungan Kebutuhan Bibit (Forward)
 
 Menghitung kebutuhan bibit berdasarkan dimensi lahan:
 
-- Input: Panjang lahan, lebar lahan, lebar guludan, lebar parit, jarak tanam
-- Output: Jumlah guludan, total populasi tanaman, estimasi kebutuhan bibit (kg/kuintal)
-- Mendukung 3 generasi bibit: **G0** (biji), **G2**, dan **G3** (kg)
+- Input: panjang/lebar lahan, lebar guludan, lebar parit, jarak tanam
+- Output: jumlah guludan, total populasi tanaman, estimasi kebutuhan bibit (biji/kg/kuintal)
+- Mendukung 3 generasi: **G0** (biji), **G2** (kg, 15 biji/kg), **G3** (kg, 12–18 biji/kg)
 
-### 2. Perhitungan Estimasi Luas Lahan (Reverse Calculation)
+### 2. Estimasi Luas Lahan (Reverse)
 
-Menghitung luas lahan yang dibutuhkan berdasarkan jumlah bibit yang tersedia:
+Menghitung luas lahan yang diperlukan berdasarkan stok bibit:
 
-- Input: Jumlah bibit, jarak tanam, lebar guludan, lebar parit
-- Output: Estimasi luas lahan (m²), jumlah guludan, panjang per guludan
+- Input: jumlah bibit, jarak tanam, lebar guludan, lebar parit
+- Output: estimasi luas lahan (m²), jumlah guludan, panjang per guludan
+- Untuk G2/G3 dengan range biji/kg, output berupa **range min–max**
 
 ### 3. Estimasi Biaya
 
-Menghitung estimasi biaya bibit berdasarkan:
-
-- Harga per kg atau kuintal (dari database atau input user)
-- Range harga (minimum-maximum) untuk berbagai skenario
+- Kalkulasi dari harga yang diinput user atau harga default dari database
+- Mendukung unit **kg**, **kuintal**, dan **biji**
+- Output berupa nilai tunggal atau range harga
 
 ### 4. Manajemen Parameter Bibit
 
-- Database parameter untuk setiap generasi bibit
-- Informasi jumlah bibit per kg dan harga satuan
-- Update parameter melalui database seeding
+- Database parameter per generasi (jumlah biji/kg, harga satuan min–max)
+- Seed data awal tersedia via `npm run db:seed`
+- Parameter dapat di-override per request via body JSON
 
-### 5. Security & Performance
+### 5. Keamanan & Performa
 
-- **CORS**: Whitelist domain tertentu
-- **Rate Limiting**: Maksimal 100 request per 15 menit
-- **Helmet**: HTTP security headers
-- **Input Validation**: express-validator untuk semua endpoint
-
----
-
-## 🛠️ Teknologi yang Digunakan
-
-### Backend Framework & Runtime
-
-- **Node.js** (v18+): JavaScript runtime environment
-- **Express.js** (v5.1.0): Web application framework
-- **Prisma ORM** (v6.13.0): Database toolkit dan ORM
-
-### Database
-
-- **PostgreSQL**: Relational database management system
-
-### Security & Middleware
-
-- **Helmet**: Security headers untuk Express
-- **CORS**: Cross-Origin Resource Sharing
-- **Express Rate Limit**: API rate limiting
-- **Express Validator**: Request validation dan sanitization
-
-### Development Tools
-
-- **Nodemon**: Auto-restart server saat development
-- **dotenv**: Environment variable management
-
-### Package Manager
-
-- **npm**: Node Package Manager
+- **CORS** — whitelist domain, support `ALLOWED_ORIGINS` via env
+- **Rate Limiting** — maks 100 request per 15 menit per IP
+- **Helmet** — HTTP security headers
+- **Joi** — schema validation & sanitasi input di setiap endpoint
 
 ---
 
-## 🏗️ Arsitektur Sistem
+## Teknologi
 
-### Struktur MVC (Model-View-Controller)
+| Kategori | Teknologi |
+|---|---|
+| Runtime | Node.js v20+ |
+| Framework | Express.js v5.2.1 |
+| ORM | Prisma v6.19.3 |
+| Database | PostgreSQL |
+| Validasi | Joi v18 |
+| Keamanan | Helmet, CORS, express-rate-limit |
+| Process Manager | PM2 (production VPS) |
+| Deployment | Vercel / VPS + Nginx |
+| Dev Tools | Nodemon, dotenv |
+
+---
+
+## Arsitektur
+
+### Struktur Direktori
 
 ```
 bibitku/
-├── controllers/          # Business logic & request handling
-│   └── calculator.controller.js
-├── services/            # Core calculation & business logic
-│   └── calculator.service.js
-├── models/              # Database interaction layer
-│   └── calculator.model.js
-├── routes/              # API route definitions
-│   └── calculator.routes.js
-├── middlewares/         # Request validation & middleware
-│   └── calculator.validator.js
-├── prisma/              # Database schema & migrations
-│   ├── schema.prisma
-│   └── seed.js
-├── index.js             # Application entry point
-├── .env                 # Environment variables (not in repo)
-├── .env.example         # Environment template
-└── package.json         # Dependencies & scripts
+├── controllers/
+│   └── calculator.controller.js     # Request handler, delegasi ke service
+├── services/
+│   └── calculator.service.js        # Logika perhitungan utama per generasi
+├── models/
+│   ├── calculator.entity.js         # SeedParameters entity class
+│   └── calculator.repository.js     # Akses database via Prisma
+├── middlewares/
+│   └── calculator.validator.js      # Joi validation middleware
+├── dtos/
+│   ├── calculateSeedNeeds.dto.js    # Schema forward calculation
+│   └── calculateReverseSeeds.dto.js # Schema reverse calculation
+├── lib/
+│   ├── calculator.helpers.js        # mergeSeedsPerKg, mergePrice, handler maps
+│   └── prisma.js                    # Prisma client singleton
+├── routes/
+│   └── calculator.routes.js         # Definisi route
+├── prisma/
+│   ├── schema.prisma                # Database schema
+│   ├── seed.js                      # Seed data awal
+│   └── migrations/                  # Riwayat migration
+├── ecosystem.config.js              # PM2 config (production)
+├── vercel.json                      # Vercel deployment config
+├── nginx-bibitku-api.conf           # Nginx reverse proxy config
+├── index.js                         # Entry point aplikasi
+└── .env.example                     # Template environment variables
 ```
 
-### Request Flow
+### Alur Request
 
 ```
 Client Request
     ↓
-[CORS Middleware]
+[CORS + Preflight Handler]
     ↓
-[Rate Limiter]
+[Rate Limiter]        ← /api/* saja
     ↓
-[Helmet Security]
+[Helmet Security Headers]
     ↓
 [Router]
     ↓
-[Validator Middleware]
+[Joi Validator Middleware]  ← validasi & parse DTO dari req.body → req.dto
     ↓
-[Controller]
+[Controller]               ← pilih handler berdasarkan generasiBibit
     ↓
-[Service Layer]
+[Service Layer]            ← logika kalkulasi per generasi
     ↓
-[Model/Database]
+[Repository]               ← query Prisma ke PostgreSQL
     ↓
-Response
+Response JSON
 ```
+
+### Pola Arsitektur
+
+Project menggunakan pola **DTO + Repository**:
+
+- **DTO** (`dtos/`) — Joi schema memvalidasi dan menormalisasi input sebelum masuk ke controller. Hasil validasi tersimpan di `req.dto`.
+- **Entity** (`models/calculator.entity.js`) — kelas `SeedParameters` membungkus row database.
+- **Repository** (`models/calculator.repository.js`) — semua query Prisma terpusat di sini.
+- **Handler Maps** (`lib/calculator.helpers.js`) — `SEED_NEEDS_HANDLERS` dan `REVERSE_SEEDS_HANDLERS` memetakan generasi ke fungsi service yang tepat, sehingga controller tidak perlu `if/else` per generasi.
 
 ---
 
-## 📥 Instalasi dan Setup
+## Instalasi dan Setup
 
 ### Prerequisites
 
-Pastikan sistem Anda telah terinstall:
-
-- **Node.js** versi 18 atau lebih tinggi
-- **npm** (biasanya sudah include dengan Node.js)
-- **PostgreSQL** versi 12 atau lebih tinggi
-- **Git** (untuk clone repository)
+- **Node.js** v20 atau lebih tinggi
+- **npm** (sudah bundled dengan Node.js)
+- **PostgreSQL** v12 atau lebih tinggi
+- **Git**
 
 ### Langkah 1: Clone Repository
 
@@ -171,101 +166,59 @@ npm install
 
 ### Langkah 3: Setup Environment Variables
 
-Copy file `.env.example` menjadi `.env`:
-
 ```bash
 cp .env.example .env
 ```
 
-Edit file `.env` sesuai konfigurasi Anda:
+Edit `.env`:
 
 ```env
-# Database Configuration
-DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DATABASE?schema=SCHEMA"
+# Wajib
+DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DATABASE?schema=public"
 
-# Server Configuration
+# Opsional
 PORT=4000
 NODE_ENV=development
 
-# Contoh:
-# DATABASE_URL="postgresql://petani:petani123@localhost:5432/kalkulator_db?schema=public"
+# CORS tambahan (comma-separated, opsional)
+ALLOWED_ORIGINS=https://your-frontend.com
 ```
+
+> Origin yang selalu diizinkan (hardcoded): `https://bibitku.site`, `https://www.bibitku.site`, `http://localhost:3000`, `http://localhost:5173`
 
 ### Langkah 4: Setup Database
 
-#### Buat Database PostgreSQL
-
 ```bash
-# Login ke PostgreSQL
-psql -U postgres
+# Buat database di PostgreSQL
+psql -U postgres -c "CREATE DATABASE kalkulator_db;"
 
-# Buat database
-CREATE DATABASE kalkulator_db;
-
-# Buat user (opsional)
-CREATE USER petani WITH PASSWORD 'petani123';
-GRANT ALL PRIVILEGES ON DATABASE kalkulator_db TO petani;
-
-# Exit
-\q
-```
-
-#### Generate Prisma Client
-
-```bash
+# Generate Prisma client
 npx prisma generate
-```
 
-#### Jalankan Database Migration
-
-```bash
+# Push schema ke database
 npx prisma db push
-```
 
-#### Seed Database dengan Data Awal
-
-```bash
+# Isi data awal (G0, G2, G3)
 npm run db:seed
 ```
 
-Perintah ini akan mengisi database dengan parameter bibit untuk G0, G2, dan G3.
-
-### Langkah 5: Verifikasi Database
+### Langkah 5: Jalankan Aplikasi
 
 ```bash
-# Buka Prisma Studio untuk melihat data
-npx prisma studio
-```
-
-Prisma Studio akan membuka di `http://localhost:5555` dan Anda dapat melihat tabel `seed_parameters`.
-
----
-
-## ▶️ Menjalankan Aplikasi
-
-### Development Mode (dengan auto-reload)
-
-```bash
+# Development (auto-reload)
 npm run dev
-```
 
-Server akan berjalan di `http://localhost:4000` (atau port yang ditentukan di `.env`)
-
-### Production Mode
-
-```bash
+# Production
 npm start
 ```
 
-### Health Check
+Server berjalan di `http://localhost:4000` (atau `PORT` dari `.env`).
 
-Setelah aplikasi berjalan, test endpoint health check:
+### Verifikasi
 
 ```bash
 curl http://localhost:4000/health
 ```
-
-Response:
 
 ```json
 {
@@ -277,35 +230,48 @@ Response:
 
 ---
 
-## 📡 API Documentation
+## API Documentation
 
 ### Base URL
 
 ```
-Development: http://localhost:4000/api
-Production: https://api-bibitku.filkom.ub.ac.id/api
+Development : http://localhost:4000/api
+Production  : https://api-bibitku.filkom.ub.ac.id/api
 ```
 
-### Endpoints Overview
+### Ringkasan Endpoint
 
-| Method | Endpoint               | Deskripsi                      |
-| ------ | ---------------------- | ------------------------------ |
-| GET    | `/`                    | Root endpoint & API info       |
-| GET    | `/parameters`          | Get seed parameters            |
-| POST   | `/calculator`          | Calculate seed needs (forward) |
-| POST   | `/calculator/generate` | Alias untuk `/calculator`      |
-| POST   | `/calculator/reverse`  | Calculate land area (reverse)  |
-| GET    | `/health`              | Health check endpoint          |
+| Method | Endpoint | Deskripsi |
+|---|---|---|
+| GET | `/health` | Health check |
+| GET | `/api` | Info API |
+| GET | `/api/parameters` | Ambil parameter bibit dari DB |
+| POST | `/api/calculator` | Hitung kebutuhan bibit (forward) |
+| POST | `/api/calculator/reverse` | Estimasi luas lahan (reverse) |
 
 ---
 
-### 1. Root Endpoint
+### GET `/health`
 
-**GET** `/api`
+Health check server.
 
-Mendapatkan informasi dasar API.
+**Response 200:**
 
-**Response:**
+```json
+{
+  "status": "ok",
+  "timestamp": "2025-11-27T10:30:00.000Z",
+  "environment": "development"
+}
+```
+
+---
+
+### GET `/api`
+
+Info dasar API.
+
+**Response 200:**
 
 ```json
 {
@@ -319,13 +285,11 @@ Mendapatkan informasi dasar API.
 
 ---
 
-### 2. Get Seed Parameters
+### GET `/api/parameters`
 
-**GET** `/api/parameters`
+Ambil semua parameter bibit dari database.
 
-Mendapatkan parameter bibit dari database (jumlah bibit per kg, harga satuan).
-
-**Response:**
+**Response 200:**
 
 ```json
 {
@@ -339,8 +303,7 @@ Mendapatkan parameter bibit dari database (jumlah bibit per kg, harga satuan).
       "seedsPerKgMax": null,
       "pricePerUnitMin": 500,
       "pricePerUnitMax": 800,
-      "priceUnit": "biji",
-      "createdAt": "2025-11-27T00:00:00.000Z"
+      "priceUnit": "biji"
     },
     {
       "id": 2,
@@ -349,8 +312,7 @@ Mendapatkan parameter bibit dari database (jumlah bibit per kg, harga satuan).
       "seedsPerKgMax": 15,
       "pricePerUnitMin": 15000,
       "pricePerUnitMax": 20000,
-      "priceUnit": "kg",
-      "createdAt": "2025-11-27T00:00:00.000Z"
+      "priceUnit": "kg"
     },
     {
       "id": 3,
@@ -359,8 +321,7 @@ Mendapatkan parameter bibit dari database (jumlah bibit per kg, harga satuan).
       "seedsPerKgMax": 18,
       "pricePerUnitMin": 12000,
       "pricePerUnitMax": 18000,
-      "priceUnit": "kg",
-      "createdAt": "2025-11-27T00:00:00.000Z"
+      "priceUnit": "kg"
     }
   ]
 }
@@ -368,9 +329,7 @@ Mendapatkan parameter bibit dari database (jumlah bibit per kg, harga satuan).
 
 ---
 
-### 3. Calculate Seed Needs (Forward)
-
-**POST** `/api/calculator` atau `/api/calculator/generate`
+### POST `/api/calculator`
 
 Menghitung kebutuhan bibit berdasarkan dimensi lahan.
 
@@ -390,21 +349,21 @@ Menghitung kebutuhan bibit berdasarkan dimensi lahan.
 }
 ```
 
-**Parameter Details:**
+**Parameter:**
 
-| Parameter           | Type          | Required | Unit    | Deskripsi                             |
-| ------------------- | ------------- | -------- | ------- | ------------------------------------- |
-| `generasiBibit`     | string        | Ya       | -       | Generasi bibit: "G0", "G2", atau "G3" |
-| `panjangLahan`      | number        | Ya       | meter   | Panjang lahan pertanian               |
-| `lebarLahan`        | number        | Ya       | meter   | Lebar lahan pertanian                 |
-| `lebarGuludan`      | number        | Tidak    | cm      | Lebar guludan (default: 80 cm)        |
-| `lebarParit`        | number        | Ya       | cm      | Lebar parit/gerandul                  |
-| `jarakTanam`        | number        | Ya       | cm      | Jarak antar tanaman                   |
-| `jumlahBibitPerKg`  | number/object | Tidak    | biji/kg | Jumlah bibit per kg (atau {min, max}) |
-| `estimasiHarga`     | number        | Tidak    | Rupiah  | Harga per unit                        |
-| `estimasiHargaUnit` | string        | Tidak    | -       | "kg", "kuintal", atau "biji"          |
+| Field | Tipe | Wajib | Satuan | Default | Deskripsi |
+|---|---|---|---|---|---|
+| `generasiBibit` | string | Ya | — | — | `"G0"`, `"G2"`, atau `"G3"` |
+| `panjangLahan` | number | Ya | meter | — | Panjang lahan |
+| `lebarLahan` | number | Ya | meter | — | Lebar lahan |
+| `lebarGuludan` | number | Tidak | cm | `80` | Lebar guludan |
+| `lebarParit` | number | Ya | cm | — | Lebar parit/gerandul |
+| `jarakTanam` | number | Ya | cm | — | Jarak antar tanaman |
+| `jumlahBibitPerKg` | number \| `{min,max}` | Tidak | biji/kg | dari DB | Override jumlah biji per kg |
+| `estimasiHarga` | number | Tidak | Rupiah | — | Override harga per unit |
+| `estimasiHargaUnit` | string | Tidak | — | — | `"kg"`, `"kuintal"`, atau `"biji"` |
 
-**Response:**
+**Response 200:**
 
 ```json
 {
@@ -437,13 +396,13 @@ Menghitung kebutuhan bibit berdasarkan dimensi lahan.
 }
 ```
 
+> Untuk **G0**: `kebutuhanBibit.unit` bernilai `"biji"`, `rangeKg` bernilai `null`, dan `estimasiBiaya` dihitung per biji.
+
 ---
 
-### 4. Calculate Land Area (Reverse)
+### POST `/api/calculator/reverse`
 
-**POST** `/api/calculator/reverse`
-
-Menghitung estimasi luas lahan berdasarkan jumlah bibit yang tersedia.
+Menghitung estimasi luas lahan berdasarkan stok bibit yang dimiliki.
 
 **Request Body:**
 
@@ -458,18 +417,18 @@ Menghitung estimasi luas lahan berdasarkan jumlah bibit yang tersedia.
 }
 ```
 
-**Parameter Details:**
+**Parameter:**
 
-| Parameter       | Type   | Required    | Unit    | Deskripsi                                    |
-| --------------- | ------ | ----------- | ------- | -------------------------------------------- |
-| `generasiBibit` | string | Ya          | -       | Generasi bibit: "G0", "G2", atau "G3"        |
-| `jumlahBibit`   | number | Ya          | biji/kg | Jumlah bibit (biji untuk G0, kg untuk G2/G3) |
-| `jumlahPerKg`   | number | Kondisional | biji/kg | **Wajib** untuk G2/G3, jumlah umbi per kg    |
-| `jarakTanam`    | number | Ya          | cm      | Jarak antar tanaman                          |
-| `lebarGuludan`  | number | Tidak       | cm      | Lebar guludan (default: 80 cm)               |
-| `lebarParit`    | number | Ya          | cm      | Lebar parit/gerandul                         |
+| Field | Tipe | Wajib | Satuan | Default | Deskripsi |
+|---|---|---|---|---|---|
+| `generasiBibit` | string | Ya | — | — | `"G0"`, `"G2"`, atau `"G3"` |
+| `jumlahBibit` | number | Ya | biji (G0) / kg (G2/G3) | — | Stok bibit yang dimiliki |
+| `jarakTanam` | number | Ya | cm | — | Jarak antar tanaman |
+| `lebarGuludan` | number | Tidak | cm | `80` | Lebar guludan |
+| `lebarParit` | number | Ya | cm | — | Lebar parit/gerandul |
+| `jumlahPerKg` | number | Tidak | biji/kg | dari DB | Override jumlah biji per kg (G2/G3) |
 
-**Response:**
+**Response 200 — G2/G3 (range):**
 
 ```json
 {
@@ -477,13 +436,38 @@ Menghitung estimasi luas lahan berdasarkan jumlah bibit yang tersedia.
   "message": "Perhitungan reverse berhasil",
   "data": {
     "ringkasan": {
-      "estimasiLuasM2": "3,000.0",
-      "jumlahGuludan": "42",
-      "panjangPerGuludan": "59.5"
+      "estimasiLuasM2": { "min": "3.000,0", "max": "4.500,0" },
+      "jumlahGuludan": { "min": "42", "max": "51" },
+      "panjangPerGuludan": { "min": "59,5", "max": "73,2" }
     },
     "estimasiPopulasi": {
-      "totalTanaman": "7,500",
-      "note": "Dengan 500 kg bibit G2 (estimasi 15 biji/kg = 7.500 bibit), Anda dapat menanam lahan seluas 3000.0 m² dengan jarak tanam 30 cm."
+      "totalTanaman": { "min": "7.500", "max": "9.000" },
+      "note": "Dengan 500 kg bibit G3 (estimasi 12–18 biji/kg), estimasi lahan yang dibutuhkan 3000,0–4500,0 m² dengan jarak tanam 30 cm."
+    }
+  }
+}
+```
+
+> Jika `seedsPerKgMin === seedsPerKgMax` (mis. G2), output `estimasiLuasM2` berupa string tunggal, bukan object `{min, max}`.
+
+**Response 200 — G0:**
+
+```json
+{
+  "success": true,
+  "message": "Perhitungan reverse berhasil",
+  "data": {
+    "ringkasan": {
+      "estimasiLuasM2": "3.000,0",
+      "jumlahGuludan": "42",
+      "panjangPerGuludan": "59,5"
+    },
+    "estimasiPopulasi": {
+      "totalTanaman": "7.500",
+      "note": "Dengan 7.500 biji bibit G0, estimasi lahan yang dibutuhkan 3000,0 m² dengan jarak tanam 30 cm."
+    },
+    "estimasiBiaya": {
+      "total": "Rp 3.750.000"
     }
   }
 }
@@ -493,30 +477,27 @@ Menghitung estimasi luas lahan berdasarkan jumlah bibit yang tersedia.
 
 ### Error Responses
 
-#### Validation Error (422)
+#### 422 — Validation Error
 
 ```json
 {
   "message": "Input yang diberikan tidak valid.",
   "errors": [
-    {
-      "generasiBibit": "Generasi harus G0, G2, atau G3."
-    }
+    { "generasiBibit": "Generasi harus G0, G2, atau G3." }
   ]
 }
 ```
 
-#### Bad Request (400)
+#### 400 — Bad Request
 
 ```json
 {
   "success": false,
-  "message": "Input tidak valid.",
-  "error": "Detail error message"
+  "message": "Generasi bibit tidak dikenali: G5"
 }
 ```
 
-#### Not Found (404)
+#### 404 — Not Found
 
 ```json
 {
@@ -526,7 +507,7 @@ Menghitung estimasi luas lahan berdasarkan jumlah bibit yang tersedia.
 }
 ```
 
-#### Rate Limit (429)
+#### 429 — Rate Limit
 
 ```json
 {
@@ -535,7 +516,7 @@ Menghitung estimasi luas lahan berdasarkan jumlah bibit yang tersedia.
 }
 ```
 
-#### Server Error (500)
+#### 500 — Server Error
 
 ```json
 {
@@ -546,126 +527,142 @@ Menghitung estimasi luas lahan berdasarkan jumlah bibit yang tersedia.
 
 ---
 
-## 🔬 Logika Perhitungan
+## Logika Perhitungan
 
-### Forward Calculation (Kebutuhan Bibit)
+### Forward — Hitung Kebutuhan Bibit
 
-#### 1. Menghitung Jumlah Guludan
+#### 1. Grid Tanam
 
-```javascript
-U = lebarGuludan + lebarParit  // Unit tanam
-J = floor(lebarLahan / U)      // Jumlah guludan penuh
-sisa = lebarLahan - (J × U)    // Sisa lebar lahan
-
-// Jika sisa >= 0.75m, tambah 1 guludan
-J_final = sisa >= 0.75 ? J + 1 : J
+```
+U       = lebarGuludan + lebarParit          (unit tanam, meter)
+J       = floor(lebarLahan / U)              (guludan penuh)
+sisa    = lebarLahan - (J × U)
+J_final = J + (sisa >= 0.75 ? 1 : 0)        (tambah guludan jika sisa ≥ 75 cm)
+T_row   = floor(panjangLahan / jarakTanam) + 1
+T_pop   = J_final × T_row
 ```
 
-#### 2. Menghitung Populasi Tanaman
+#### 2. Kebutuhan Bibit
 
-```javascript
-T_row = floor(panjangLahan / jarakTanam) + 1  // Tanaman per guludan
-T_pop = J_final × T_row                        // Total populasi
+**G0:**
+```
+kebutuhanBibit = T_pop  (dalam biji)
 ```
 
-#### 3. Menghitung Kebutuhan Bibit
-
-**Untuk G0 (biji):**
-
-```javascript
-kebutuhanBibit = T_pop; // langsung dalam biji
+**G2 / G3:**
+```
+kg_min = ceil(T_pop / seedsPerKg_max)
+kg_max = ceil(T_pop / seedsPerKg_min)
+kg_est = ceil((kg_min + kg_max) / 2)
 ```
 
-**Untuk G2/G3 (kg):**
+#### 3. Estimasi Biaya
 
-```javascript
-kg_min = ceil(T_pop / seedsPerKg_max);
-kg_max = ceil(T_pop / seedsPerKg_min);
-kg_est = ceil((kg_min + kg_max) / 2);
 ```
-
-#### 4. Estimasi Biaya
-
-```javascript
-// Konversi harga ke per kg jika dalam kuintal
-priceKg = (unit === "kuintal") ? price / 100 : price
-
-// Hitung total biaya
-totalBiaya = priceKg × kebutuhanBibit
-```
-
-### Reverse Calculation (Estimasi Luas Lahan)
-
-#### 1. Menghitung Total Tanaman
-
-```javascript
-// G0: langsung dalam biji
-totalTanaman = (gen === "G0") ? jumlahBibit : jumlahBibit × jumlahPerKg
-```
-
-#### 2. Menghitung Dimensi Lahan
-
-```javascript
-lebarUnitTanam = lebarGuludan + lebarParit
-targetRasio = 1.5  // Rasio panjang:lebar yang ideal
-
-// Optimasi jumlah guludan
-jumlahGuludan = round(sqrt(totalTanaman × jarakTanam / (targetRasio × lebarUnitTanam)))
-
-tanamanPerGuludan = ceil(totalTanaman / jumlahGuludan)
-panjangPerGuludan = tanamanPerGuludan × jarakTanam
-lebarLahan = jumlahGuludan × lebarUnitTanam
-estimasiLuasM2 = panjangPerGuludan × lebarLahan
+priceKg   = (unit === "kuintal") ? price / 100 : price
+totalBiaya = priceKg × kg_est   (atau T_pop untuk G0)
 ```
 
 ---
 
-## 🗄️ Database Schema
+### Reverse — Estimasi Luas Lahan
+
+#### 1. Total Tanaman
+
+```
+G0 : totalTanaman = jumlahBibit
+G2/G3 : totalTanaman = jumlahBibit × seedsPerKg  (dihitung untuk min dan max)
+```
+
+#### 2. Dimensi Lahan (target rasio panjang:lebar = 1.5)
+
+```
+lebarUnitTanam = lebarGuludan + lebarParit
+jumlahGuludan  = round(sqrt(totalTanaman × jarakTanam / (1.5 × lebarUnitTanam)))
+tanamanPerGuludan = ceil(totalTanaman / jumlahGuludan)
+panjangPerGuludan = tanamanPerGuludan × jarakTanam
+lebarLahan        = jumlahGuludan × lebarUnitTanam
+estimasiLuasM2    = panjangPerGuludan × lebarLahan
+```
+
+> Untuk G2/G3 dengan range biji/kg, kalkulasi dijalankan dua kali (untuk `seedsPerKgMin` dan `seedsPerKgMax`) dan hasilnya disajikan sebagai range.
+
+---
+
+## Database Schema
 
 ### Tabel: `seed_parameters`
 
-| Column               | Type      | Constraints                 | Deskripsi                    |
-| -------------------- | --------- | --------------------------- | ---------------------------- |
-| `id`                 | INTEGER   | PRIMARY KEY, AUTO_INCREMENT | ID unik                      |
-| `generation_name`    | VARCHAR   | UNIQUE, NOT NULL            | Nama generasi (G0/G2/G3)     |
-| `seeds_per_kg_min`   | INTEGER   | NULLABLE                    | Minimum jumlah bibit per kg  |
-| `seeds_per_kg_max`   | INTEGER   | NULLABLE                    | Maximum jumlah bibit per kg  |
-| `price_per_unit_min` | INTEGER   | NULLABLE                    | Harga minimum per unit       |
-| `price_per_unit_max` | INTEGER   | NULLABLE                    | Harga maximum per unit       |
-| `price_unit`         | VARCHAR   | NOT NULL                    | Unit harga (kg/kuintal/biji) |
-| `created_at`         | TIMESTAMP | DEFAULT NOW()               | Timestamp pembuatan          |
+| Kolom | Tipe | Constraint | Keterangan |
+|---|---|---|---|
+| `id` | INTEGER | PK, AUTO | ID unik |
+| `generation_name` | VARCHAR | UNIQUE, NOT NULL | Generasi bibit (G0/G2/G3) |
+| `seeds_per_kg_min` | INTEGER | NULLABLE | Min biji per kg |
+| `seeds_per_kg_max` | INTEGER | NULLABLE | Max biji per kg |
+| `price_per_unit_min` | INTEGER | NULLABLE | Harga minimum per unit |
+| `price_per_unit_max` | INTEGER | NULLABLE | Harga maksimum per unit |
+| `price_unit` | VARCHAR | NOT NULL | Unit harga: `kg`, `kuintal`, `biji` |
+| `created_at` | TIMESTAMP | DEFAULT NOW() | Waktu dibuat |
 
-**Sample Data:**
+**Data Awal (seed):**
 
 ```sql
-INSERT INTO seed_parameters (generation_name, seeds_per_kg_min, seeds_per_kg_max, price_per_unit_min, price_per_unit_max, price_unit)
-VALUES
-  ('G0', NULL, NULL, 500, 800, 'biji'),
-  ('G2', 15, 15, 15000, 20000, 'kg'),
-  ('G3', 12, 18, 12000, 18000, 'kg');
+INSERT INTO seed_parameters VALUES
+  ('G0', NULL, NULL, 500,   800,   'biji'),
+  ('G2', 15,   15,   15000, 20000, 'kg'),
+  ('G3', 12,   18,   12000, 18000, 'kg');
 ```
 
 ---
 
-## 🧪 Testing
+## Deployment
 
-### Manual Testing dengan cURL
+Project mendukung dua opsi deployment.
 
-#### Test Health Check
+### Opsi 1: Vercel (Serverless)
+
+Sudah dikonfigurasi via `vercel.json`. Deploy langsung dari GitHub atau Vercel CLI:
 
 ```bash
+vercel --prod
+```
+
+Pastikan environment variable `DATABASE_URL` sudah diset di dashboard Vercel.
+
+### Opsi 2: VPS + PM2 + Nginx
+
+Gunakan `ecosystem.config.js` untuk menjalankan dengan PM2:
+
+```bash
+# Install PM2 global
+npm install -g pm2
+
+# Start aplikasi
+pm2 start ecosystem.config.js
+
+# Simpan process list
+pm2 save
+pm2 startup
+```
+
+Konfigurasi Nginx reverse proxy tersedia di `nginx-bibitku-api.conf`.
+
+Script deploy otomatis tersedia di `deploy.sh`.
+
+---
+
+## Testing
+
+### cURL
+
+```bash
+# Health check
 curl http://localhost:4000/health
-```
 
-#### Test Get Parameters
-
-```bash
+# Get parameters
 curl http://localhost:4000/api/parameters
-```
 
-#### Test Calculator (Forward)
-
-```bash
+# Forward — G2
 curl -X POST http://localhost:4000/api/calculator \
   -H "Content-Type: application/json" \
   -d '{
@@ -675,132 +672,61 @@ curl -X POST http://localhost:4000/api/calculator \
     "lebarParit": 40,
     "jarakTanam": 30
   }'
-```
 
-#### Test Calculator (Reverse)
-
-```bash
+# Reverse — G3
 curl -X POST http://localhost:4000/api/calculator/reverse \
   -H "Content-Type: application/json" \
   -d '{
-    "generasiBibit": "G2",
+    "generasiBibit": "G3",
     "jumlahBibit": 500,
-    "jumlahPerKg": 15,
     "jarakTanam": 30,
     "lebarParit": 40
   }'
 ```
 
-### Testing dengan Postman
+### Prisma Studio
 
-1. Import collection dari dokumentasi ini
-2. Set environment variable `baseUrl` = `http://localhost:4000`
-3. Jalankan collection runner
+```bash
+npx prisma studio
+# Buka http://localhost:5555 untuk melihat data di tabel seed_parameters
+```
 
 ---
 
-## 👥 Pengembangan
-
-### Setup Development Environment
+## Git Workflow
 
 ```bash
-# Clone repository
-git clone https://github.com/daniadrian/kentangpas.git
-cd kentangpas
-
-# Install dependencies
-npm install
-
-# Setup environment
-cp .env.example .env
-
-# Setup database
-npx prisma generate
-npx prisma db push
-npm run db:seed
-
-# Jalankan development server
-npm run dev
-```
-
-### Git Workflow
-
-```bash
-# Buat branch baru untuk fitur
+# Buat branch fitur
 git checkout -b feature/nama-fitur
 
-# Commit changes
-git add .
-git commit -m "feat: deskripsi fitur"
+# Commit dengan Conventional Commits
+git commit -m "feat: deskripsi fitur baru"
+git commit -m "fix: perbaiki perhitungan guludan"
+git commit -m "refactor: pisah logika kalkulasi per generasi"
 
-# Push ke remote
+# Push dan buat Pull Request
 git push origin feature/nama-fitur
-
-# Buat Pull Request di GitHub
 ```
 
-### Commit Message Convention
-
-Gunakan format [Conventional Commits](https://www.conventionalcommits.org/):
-
-- `feat:` - Fitur baru
-- `fix:` - Bug fix
-- `docs:` - Perubahan dokumentasi
-- `style:` - Perubahan formatting
-- `refactor:` - Refactoring code
-- `test:` - Menambah/update test
-- `chore:` - Maintenance tasks
-
-**Contoh:**
-
-```
-feat: menambahkan validasi input tambahan
-fix: memperbaiki perhitungan guludan
-docs: update API documentation
-```
+**Format Conventional Commits:** `feat` / `fix` / `docs` / `style` / `refactor` / `test` / `chore`
 
 ---
 
-## 📚 Resources untuk Developer
-
-### Dokumentasi Teknologi
+## Resources
 
 - [Node.js Documentation](https://nodejs.org/docs/)
 - [Express.js Guide](https://expressjs.com/en/guide/routing.html)
 - [Prisma Documentation](https://www.prisma.io/docs/)
-- [PostgreSQL Tutorial](https://www.postgresql.org/docs/)
-
-### Referensi Project
-
-- **Repository**: [github.com/daniadrian/kentangpas](https://github.com/daniadrian/kentangpas)
+- [Joi Validation](https://joi.dev/api/)
+- [Repository](https://github.com/daniadrian/kentangpas)
 
 ---
 
-## 📞 Kontak
+## Kontak
 
-### Developer
-
-- **WhatsApp**: [+62 822-7749-2956](https://wa.me/6282277492956)
-
-### Laboratorium Sistem Informasi
-
-- **Lokasi**: Fakultas Ilmu Komputer, Universitas Brawijaya, Malang
+- **Developer**: Dani Adrian — [WhatsApp](https://wa.me/6282277492956)
+- **Institusi**: Laboratorium Sistem Informasi, Fakultas Ilmu Komputer, Universitas Brawijaya, Malang
 
 ---
 
-## 🙏 Acknowledgments
-
-Project ini dikembangkan sebagai bagian dari kegiatan penelitian dan pengembangan di:
-
-- **Laboratorium Sistem Informasi**
-- **Fakultas Ilmu Komputer**
-- **Universitas Brawijaya**
-
-Terima kasih kepada:
-
-- Tim Laboratorium Sistem Informasi
-- Para petani kentang yang telah memberikan insight
-
----
-
-> _"Teknologi untuk Pertanian yang Lebih Baik"_
+> *"Teknologi untuk Pertanian yang Lebih Baik"*
