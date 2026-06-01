@@ -1,4 +1,8 @@
 const CalculatorService = require("../services/calculator.service.js");
+const {
+  SEED_NEEDS_HANDLERS,
+  REVERSE_SEEDS_HANDLERS,
+} = require("../lib/calculator.helpers");
 
 const getRoot = (req, res) => {
   res.status(200).json({
@@ -25,12 +29,6 @@ const getSeedParameters = async (req, res) => {
       error: error.message,
     });
   }
-};
-
-const SEED_NEEDS_HANDLERS = {
-  G0: (dto) => CalculatorService.calculateSeedNeedsG0(dto),
-  G2: (dto) => CalculatorService.calculateSeedNeedsG2(dto),
-  G3: (dto) => CalculatorService.calculateSeedNeedsG3(dto),
 };
 
 const calculateSeeds = async (req, res) => {
@@ -60,12 +58,6 @@ const calculateSeeds = async (req, res) => {
       error: error.message,
     });
   }
-};
-
-const REVERSE_SEEDS_HANDLERS = {
-  G0: (dto) => CalculatorService.calculateReverseSeedsG0(dto),
-  G2: (dto) => CalculatorService.calculateReverseSeedsG2(dto),
-  G3: (dto) => CalculatorService.calculateReverseSeedsG3(dto),
 };
 
 const calculateReverseSeedsController = async (req, res) => {
