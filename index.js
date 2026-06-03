@@ -1,13 +1,5 @@
 require("dotenv").config();
 
-const REQUIRED_ENV = ["DATABASE_URL"];
-for (const key of REQUIRED_ENV) {
-  if (!process.env[key]) {
-    console.error(`Missing required environment variable: ${key}`);
-    process.exit(1);
-  }
-}
-
 const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
@@ -92,17 +84,27 @@ app.use((err, req, res, next) => {
 
 module.exports = app;
 
-const PORT = process.env.PORT || 4000;
-app.listen(PORT, "0.0.0.0", () => {
-  console.log(`🚀 Backend server running on port ${PORT}`);
-  console.log(`📍 Environment: ${process.env.NODE_ENV || "development"}`);
-  console.log(`🔗 Health check: http://localhost:${PORT}/health`);
-});
+if (require.main === module) {
+  const REQUIRED_ENV = ["DATABASE_URL"];
+  for (const key of REQUIRED_ENV) {
+    if (!process.env[key]) {
+      console.error(`Missing required environment variable: ${key}`);
+      process.exit(1);
+    }
+  }
 
-const shutdown = async () => {
-  await prisma.$disconnect();
-  process.exit(0);
-};
+  const PORT = process.env.PORT || 4000;
+  app.listen(PORT, "0.0.0.0", () => {
+    console.log(`🚀 Backend server running on port ${PORT}`);
+    console.log(`📍 Environment: ${process.env.NODE_ENV || "development"}`);
+    console.log(`🔗 Health check: http://localhost:${PORT}/health`);
+  });
 
-process.on("SIGTERM", shutdown);
-process.on("SIGINT", shutdown);
+  const shutdown = async () => {
+    await prisma.$disconnect();
+    process.exit(0);
+  };
+
+  process.on("SIGTERM", shutdown);
+  process.on("SIGINT", shutdown);
+}
