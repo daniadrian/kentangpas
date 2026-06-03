@@ -1,8 +1,16 @@
 const CalculatorService = require("../services/calculator.service.js");
-const {
-  SEED_NEEDS_HANDLERS,
-  REVERSE_SEEDS_HANDLERS,
-} = require("../lib/calculator.helpers");
+
+const SEED_NEEDS_HANDLERS = {
+  G0: (dto) => CalculatorService.calculateSeedNeedsG0(dto),
+  G2: (dto) => CalculatorService.calculateSeedNeedsG2(dto),
+  G3: (dto) => CalculatorService.calculateSeedNeedsG3(dto),
+};
+
+const REVERSE_SEEDS_HANDLERS = {
+  G0: (dto) => CalculatorService.calculateReverseSeedsG0(dto),
+  G2: (dto) => CalculatorService.calculateReverseSeedsG2(dto),
+  G3: (dto) => CalculatorService.calculateReverseSeedsG3(dto),
+};
 
 const getRoot = (req, res) => {
   res.status(200).json({
